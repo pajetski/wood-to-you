@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wood to You — Find Supplies. Anywhere.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080808;
+    --surface: #111111;
+    --surface-2: #1a1a1a;
+    --surface-3: #222222;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.14);
+    --amber: #e8750a;
+    --amber-dim: rgba(232,117,10,0.12);
+    --amber-glow: rgba(232,117,10,0.25);
+    --amber-light: #f59340;
+    --text-primary: #f0ede8;
+    --text-secondary: rgba(240,237,232,0.55);
+    --text-muted: rgba(240,237,232,0.3);
+    --green: #2eb87e;
+    --green-dim: rgba(46,184,126,0.1);
+    --nav-h: 72px;
+    --radius-card: 20px;
+    --radius-pill: 100px;
+    --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRAIN OVERLAY ─────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ─── NAV ────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 100;
+    background: rgba(8,8,8,0.75);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .nav-logo {
+    width: 36px;
+    height: 36px;
+    background: var(--amber);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    color: #080808;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+
+  .nav-wordmark {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .nav-wordmark span { color: var(--amber); }
+
+  /* Location pill */
+  .location-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 500ms var(--spring);
+    flex-shrink: 0;
+  }
+  .location-pill:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-2);
+  }
+  .location-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--amber);
+    animation: pulse-dot 2.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 var(--amber-glow); }
+    50% { box-shadow: 0 0 0 6px rgba(232,117,10,0); }
+  }
+  .location-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .location-city {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .chevron-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+  }
+
+  /* Nav right */
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 8px 16px;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 500ms var(--spring);
+    text-decoration: none;
+  }
+  .nav-btn:hover { background: var(--surface); color: var(--text-primary); border-color: var(--border-hover); }
+  .nav-btn-primary {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #080808;
+    font-weight: 600;
+  }
+  .nav-btn-primary:hover { background: var(--amber-light); border-color: var(--amber-light); color: #080808; }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 400ms var(--spring);
+  }
+  .avatar:hover { border-color: var(--amber); color: var(--amber); }
+
+  /* ─── MAIN CONTENT ───────────────────────────────── */
+  main {
+    padding-top: calc(var(--nav-h) + 32px);
+    padding-bottom: 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* ─── HERO SEARCH ────────────────────────────────── */
+  .hero-section {
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: entry 700ms var(--spring) 100ms forwards;
+  }
+  @keyframes entry {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-greeting {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .hero-headline {
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+  }
+  .hero-headline span { color: var(--amber); }
+
+  /* Search bar */
+  .search-wrap {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .search-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 12px 20px;
+    cursor: text;
+    transition: all 500ms var(--spring);
+  }
+  .search-bar:focus-within {
+    border-color: var(--amber);
+    background: var(--surface-2);
+    box-shadow: 0 0 0 4px var(--amber-dim);
+  }
+
+  .search-icon { color: var(--text-muted); flex-shrink: 0; }
+
+  .search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  .search-kbd {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 6px;
+    flex-shrink: 0;
+  }
+
+  .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 12px 20px;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 400ms var(--spring);
+    white-space: nowrap;
+  }
+  .filter-btn:hover { background: var(--surface-2); color: var(--text-primary); border-color: var(--border-hover); }
+
+  /* ─── STATS STRIP ────────────────────────────────── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 44px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: entry 700ms var(--spring) 200ms forwards;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 500ms var(--spring);
+    cursor: default;
+  }
+  .stat-card:hover { background: var(--surface-2); border-color: var(--border-hover); transform: translateY(-2px); }
+
+  .stat-icon {
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+  .stat-icon.amber { background: var(--amber-dim); }
+  .stat-icon.green { background: var(--green-dim); }
+  .stat-icon.blue { background: rgba(99,179,237,0.1); }
+  .stat-icon.purple { background: rgba(160,132,255,0.1); }
+
+  .stat-val {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 3px; letter-spacing: 0.02em; }
+
+  /* ─── CATEGORIES ──────────────────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+  }
+  .section-title span { color: var(--text-muted); font-weight: 400; font-size: 14px; margin-left: 8px; }
+
+  .see-all {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--amber);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 300ms;
+  }
+  .see-all:hover { opacity: 0.7; }
+
+  .categories-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 44px;
+    scrollbar-width: none;
+  }
+  .categories-scroll::-webkit-scrollbar { display: none; }
+
+  .cat-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: all 400ms var(--spring);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .cat-chip:hover, .cat-chip.active {
+    background: var(--amber-dim);
+    border-color: rgba(232,117,10,0.4);
+    color: var(--amber);
+  }
+  .cat-chip span { font-size: 13px; font-weight: 500; color: inherit; transition: color 300ms; }
+  .cat-chip:hover span, .cat-chip.active span { color: var(--amber); }
+
+  .cat-emoji { font-size: 15px; line-height: 1; }
+
+  /* ─── HORIZONTAL SCROLL CARDS ────────────────────── */
+  .h-scroll-section {
+    margin-bottom: 52px;
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .h-scroll-section.visible {
+    animation: entry 700ms var(--spring) forwards;
+  }
+
+  .h-scroll-track {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .h-scroll-track::-webkit-scrollbar { display: none; }
+  .h-scroll-track:active { cursor: grabbing; }
+
+  /* ─── RETAILER CARDS ─────────────────────────────── */
+  .retailer-card {
+    flex-shrink: 0;
+    width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 500ms var(--spring);
+    text-decoration: none;
+    display: block;
+  }
+  .retailer-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .retailer-banner {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .retailer-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(8,8,8,0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .retailer-badge.busy { color: var(--amber); }
+
+  .retailer-info {
+    padding: 14px 16px;
+  }
+
+  .retailer-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+  }
+
+  .retailer-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-hover); flex-shrink: 0; }
+
+  .retailer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .eta-tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .eta-tag.fast { color: var(--green); }
+
+  .order-btn {
+    background: var(--amber-dim);
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--amber);
+    cursor: pointer;
+    transition: all 300ms var(--spring);
+  }
+  .order-btn:hover { background: var(--amber); color: #080808; }
+
+  .star-rating {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--amber-light);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* ─── CONTRACTOR CARDS ────────────────────────────── */
+  .contractors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 52px;
+  }
+
+  .contractor-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 500ms var(--spring);
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .contractor-card.visible {
+    animation: entry 600ms var(--spring) calc(var(--i) * 80ms) forwards;
+  }
+  .contractor-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-hover);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.35);
+  }
+
+  .contractor-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .contractor-avatar {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  .contractor-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+    margin-bottom: 3px;
+  }
+
+  .contractor-specialty {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .contractor-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .badge.verified { background: var(--green-dim); color: var(--green); border: 1px solid rgba(46,184,126,0.2); }
+  .badge.licensed { background: rgba(99,179,237,0.08); color: #63b3ed; border: 1px solid rgba(99,179,237,0.2); }
+  .badge.premium { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(232,117,10,0.25); }
+
+  .contractor-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 14px 0;
+  }
+
+  .contractor-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .c-stat {
+    text-align: center;
+    padding: 8px 4px;
+    background: var(--surface-2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .c-stat-val { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+  .c-stat-label { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+  .contractor-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .skill-tag {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .contractor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .avail-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .avail-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .avail-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse-dot 2s ease-in-out infinite; }
+  .avail-dot.busy { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+  .avail-dot.offline { background: rgba(255,255,255,0.2); }
+  .avail-text.online { color: var(--green); }
+  .avail-text.busy { color: var(--amber); }
+  .avail-text.offline { color: var(--text-muted); }
+
+  .contact-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 400ms var(--spring);
+  }
+  .contact-btn:hover { background: var(--amber); border-color: var(--amber); color: #080808; }
+
+  /* ─── REQUEST BANNER ─────────────────────────────── */
+  .request-banner {
+    background: linear-gradient(135deg, rgba(232,117,10,0.15) 0%, rgba(232,117,10,0.05) 100%);
+    border: 1px solid rgba(232,117,10,0.25);
+    border-radius: 24px;
+    padding: 32px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 52px;
+    opacity: 0;
+    transform: translateY(20px);
+    overflow: hidden;
+    position: relative;
+  }
+  .request-banner.visible {
+    animation: entry 700ms var(--spring) forwards;
+  }
+
+  .banner-glow {
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(232,117,10,0.15) 0%, transparent 70%);
+    top: -100px; right: -50px;
+    pointer-events: none;
+  }
+
+  .banner-text h3 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .banner-text p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    max-width: 400px;
+  }
+
+  .banner-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--amber);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 12px 22px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: #080808;
+    cursor: pointer;
+    transition: all 400ms var(--spring);
+    white-space: nowrap;
+  }
+  .btn-primary:hover { background: var(--amber-light); transform: translateY(-1px); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-pill);
+    padding: 12px 22px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 400ms var(--spring);
+    white-space: nowrap;
+  }
+  .btn-secondary:hover { background: var(--surface); color: var(--text-primary); border-color: var(--border-hover); }
+
+  /* ─── ACTIVE ORDERS ──────────────────────────────── */
+  .active-orders {
+    margin-bottom: 52px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .active-orders.visible { animation: entry 700ms var(--spring) forwards; }
+
+  .order-track-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 400ms var(--spring);
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .order-track-card:hover { border-color: var(--border-hover); background: var(--surface-2); }
+
+  .order-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: var(--amber-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .order-info { flex: 1; }
+  .order-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .order-sub { font-size: 12px; color: var(--text-muted); }
+
+  .order-progress {
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .progress-bar-wrap {
+    width: 120px;
+    height: 4px;
+    background: var(--surface-3);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--amber);
+    transition: width 1s var(--spring);
+  }
+  .progress-label { font-size: 11px; font-weight: 600; color: var(--amber); }
+
+  /* ─── HOW IT WORKS ────────────────────────────────── */
+  .how-it-works {
+    margin-bottom: 60px;
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .how-it-works.visible { animation: entry 700ms var(--spring) forwards; }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px 22px;
+    position: relative;
+    transition: all 500ms var(--spring);
+  }
+  .step-card:hover { transform: translateY(-3px); border-color: var(--border-hover); }
+
+  .step-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .step-icon { font-size: 28px; margin-bottom: 12px; }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ─── LOCATION MODAL ─────────────────────────────── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms var(--spring);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    width: 100%;
+    max-width: 440px;
+    transform: translateY(30px) scale(0.96);
+    transition: all 500ms var(--spring);
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+
+  .modal-title { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+  .modal-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    transition: all 400ms var(--spring);
+  }
+  .modal-input-wrap:focus-within { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-dim); }
+  .modal-input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: inherit; font-size: 15px; color: var(--text-primary);
+  }
+  .modal-input::placeholder { color: var(--text-muted); }
+
+  .location-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .suggestion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 300ms var(--spring);
+  }
+  .suggestion:hover { border-color: rgba(232,117,10,0.4); background: var(--amber-dim); }
+  .suggestion-icon { font-size: 18px; flex-shrink: 0; }
+  .suggestion-text { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .suggestion-sub { font-size: 11px; color: var(--text-muted); }
+
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-cancel {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 300ms;
+  }
+  .modal-cancel:hover { color: var(--text-primary); }
+
+  .modal-confirm {
+    flex: 2;
+    background: var(--amber);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: #080808;
+    cursor: pointer;
+    transition: all 400ms var(--spring);
+  }
+  .modal-confirm:hover { background: var(--amber-light); transform: translateY(-1px); }
+  .modal-confirm:active { transform: scale(0.98); }
+
+  /* ─── TOAST ──────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 12px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 300;
+    transition: transform 500ms var(--spring);
+    white-space: nowrap;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 768px) {
+    main { padding-left: 16px; padding-right: 16px; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .steps-grid { grid-template-columns: 1fr; }
+    .contractors-grid { grid-template-columns: 1fr; }
+    .request-banner { flex-direction: column; align-items: flex-start; }
+    .banner-actions { width: 100%; }
+    .btn-primary, .btn-secondary { flex: 1; justify-content: center; }
+    .order-track-card { flex-wrap: wrap; }
+    .order-progress { width: 100%; text-align: left; margin-top: 10px; }
+    .progress-bar-wrap { width: 100%; }
+    nav .nav-btn:not(.nav-btn-primary):not(:last-child) { display: none; }
+    .search-kbd { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <div class="nav-logo">W2</div>
+    <span class="nav-wordmark">Wood <span>to You</span></span>
+  </a>
+
+  <div class="location-pill" id="locationPill" onclick="openModal()">
+    <div class="location-dot"></div>
+    <span class="location-text">Delivering to <span class="location-city" id="cityDisplay">Encinitas, CA</span></span>
+    <svg class="chevron-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M4 6l4 4 4-4"/>
+    </svg>
+  </div>
+
+  <div class="nav-right">
+    <a href="marketplace-interface.html" class="nav-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/>
+        <rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>
+      </svg>
+      Dispatch
+    </a>
+    <button class="nav-btn nav-btn-primary">Post a Job</button>
+    <div class="avatar">BP</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero-section">
+    <p class="hero-greeting">Good morning, Brett</p>
+    <h1 class="hero-headline">Get building supplies<br><span>delivered to your site</span></h1>
+    <div class="search-wrap">
+      <div class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="9" cy="9" r="6"/><path d="M15 15l3 3"/>
+        </svg>
+        <input class="search-input" type="text" placeholder="Search retailers, materials, contractors..." id="searchInput" />
+        <span class="search-kbd">⌘K</span>
+      </div>
+      <button class="filter-btn">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4h12M5 8h6M7 12h2"/>
+        </svg>
+        Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stat-card">
+      <div class="stat-icon amber">🏪</div>
+      <div>
+        <div class="stat-val">14</div>
+        <div class="stat-label">Retailers Nearby</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">👷</div>
+      <div>
+        <div class="stat-val">32</div>
+        <div class="stat-label">Contractors Online</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">⚡</div>
+      <div>
+        <div class="stat-val">18 min</div>
+        <div class="stat-label">Avg Delivery ETA</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">📦</div>
+      <div>
+        <div class="stat-val">5</div>
+        <div class="stat-label">Active Deliveries</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section-header">
+    <div class="section-title">Browse by Category</div>
+  </div>
+  <div class="categories-scroll">
+    <div class="cat-chip active" onclick="filterCat(this)"><span class="cat-emoji">🔨</span><span>All</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🪵</span><span>Lumber</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🧱</span><span>Drywall</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🔌</span><span>Electrical</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🚿</span><span>Plumbing</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🏠</span><span>Roofing</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🎨</span><span>Paint & Finish</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🪟</span><span>Doors & Windows</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🔩</span><span>Hardware</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">⛏️</span><span>Tools</span></div>
+    <div class="cat-chip" onclick="filterCat(this)"><span class="cat-emoji">🏗️</span><span>Concrete</span></div>
+  </div>
+
+  <!-- NEARBY RETAILERS -->
+  <div class="h-scroll-section" id="retailersSection">
+    <div class="section-header">
+      <div class="section-title">Nearby Retailers <span>14 available</span></div>
+      <a href="#" class="see-all">See all →</a>
+    </div>
+    <div class="h-scroll-track" id="retailerTrack">
+
+      <div class="retailer-card">
+        <div class="retailer-banner" style="background:linear-gradient(135deg,#1a0f00,#2d1a00);">
+          🏠
+          <div class="retailer-badge">Open Now</div>
+        </div>
+        <div class="retailer-info">
+          <div class="retailer-name">Home Depot</div>
+          <div class="retailer-meta">
+            <div class="star-rating">★ 4.8</div>
+            <div class="meta-dot"></div>
+            <span>2.1 mi away</span>
+            <div class="meta-dot"></div>
+            <span>Lumber · Tools</span>
+          </div>
+          <div class="retailer-footer">
+            <div class="eta-tag fast">⚡ 12 min ETA</div>
+            <button class="order-btn" onclick="showToast('Browsing Home Depot...')">Browse</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="retailer-card">
+        <div class="retailer-banner" style="background:linear-gradient(135deg,#001a0a,#002d12);">
+          🪵
+          <div class="retailer-badge">Open Now</div>
+        </div>
+        <div class="retailer-info">
+          <div class="retailer-name">84 Lumber</div>
+          <div class="retailer-meta">
+            <div class="star-rating">★ 4.6</div>
+            <div class="meta-dot"></div>
+            <span>3.4 mi away</span>
+            <div class="meta-dot"></div>
+            <span>Lumber · Drywall</span>
+          </div>
+          <div class="retailer-footer">
+            <div class="eta-tag fast">⚡ 18 min ETA</div>
+            <button class="order-btn" onclick="showToast('Browsing 84 Lumber...')">Browse</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="retailer-card">
+        <div class="retailer-banner" style="background:linear-gradient(135deg,#1a0000,#2d0a0a);">
+          🔧
+          <div class="retailer-badge busy">Busy</div>
+        </div>
+        <div class="retailer-info">
+          <div class="retailer-name">Ace Hardware</div>
+          <div class="retailer-meta">
+            <div class="star-rating">★ 4.7</div>
+            <div class="meta-dot"></div>
+            <span>1.2 mi away</span>
+            <div class="meta-dot"></div>
+            <span>Hardware · Paint</span>
+          </div>
+          <div class="retailer-footer">
+            <div class="eta-tag">🕐 28 min ETA</div>
+            <button class="order-btn" onclick="showToast('Browsing Ace Hardware...')">Browse</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="retailer-card">
+        <div class="retailer-banner" style="background:linear-gradient(135deg,#001220,#002040);">
+          🏗️
+          <div class="retailer-badge">Open Now</div>
+        </div>
+        <div class="retailer-info">
+          <div class="retailer-name">Pacific Coast Supply</div>
+          <div class="retailer-meta">
+            <div class="star-rating">★ 4.5</div>
+            <div class="meta-dot"></div>
+            <span>4.7 mi away</span>
+            <div class="meta-dot"></div>
+            <span>Concrete · Roofing</span>
+          </div>
+          <div class="retailer-footer">
+            <div class="eta-tag">🕐 25 min ETA</div>
+            <button class="order-btn" onclick="showToast('Browsing Pacific Coast...')">Browse</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="retailer-card">
+        <div class="retailer-banner" style="background:linear-gradient(135deg,#0d1a00,#1a2d00);">
+          🔌
+          <div class="retailer-badge">Open Now</div>
+        </div>
+        <div class="retailer-info">
+          <div class="retailer-name">Fastenal</div>
+          <div class="retailer-meta">
+            <div class="star-rating">★ 4.4</div>
+            <div class="meta-dot"></div>
+            <span>5.1 mi away</span>
+            <div class="meta-dot"></div>
+            <span>Electrical · Hardware</span>
+          </div>
+          <div class="retailer-footer">
+            <div class="eta-tag">🕐 30 min ETA</div>
+            <button class="order-btn" onclick="showToast('Browsing Fastenal...')">Browse</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="retailer-card">
+        <div class="retailer-banner" style="background:linear-gradient(135deg,#1a1200,#2d2000);">
+          🚿
+          <div class="retailer-badge">Open Now</div>
+        </div>
+        <div class="retailer-info">
+          <div class="retailer-name">Ferguson Supply</div>
+          <div class="retailer-meta">
+            <div class="star-rating">★ 4.9</div>
+            <div class="meta-dot"></div>
+            <span>3.8 mi away</span>
+            <div class="meta-dot"></div>
+            <span>Plumbing · HVAC</span>
+          </div>
+          <div class="retailer-footer">
+            <div class="eta-tag fast">⚡ 15 min ETA</div>
+            <button class="order-btn" onclick="showToast('Browsing Ferguson...')">Browse</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- REQUEST BANNER -->
+  <div class="request-banner" id="bannerSection">
+    <div class="banner-glow"></div>
+    <div class="banner-text">
+      <h3>Need supplies delivered to your site?</h3>
+      <p>Post a job in under 2 minutes. Our network of qualified drivers will have your materials there fast.</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn-primary" onclick="showToast('Opening job post form...')">
+        📋 Post a Job
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 8h10M9 4l4 4-4 4"/>
+        </svg>
+      </button>
+      <button class="btn-secondary" onclick="showToast('Loading how it works...')">How it works</button>
+    </div>
+  </div>
+
+  <!-- ACTIVE DELIVERIES -->
+  <div class="active-orders" id="ordersSection">
+    <div class="section-header">
+      <div class="section-title">Active Deliveries <span>5 in progress</span></div>
+      <a href="#" class="see-all">Track all →</a>
+    </div>
+
+    <div class="order-track-card" onclick="showToast('Tracking order #W2-4821...')">
+      <div class="order-icon">🪵</div>
+      <div class="order-info">
+        <div class="order-title">2×4 Douglas Fir Lumber — 48 boards</div>
+        <div class="order-sub">From 84 Lumber · Driver: Marcus T. · Order #W2-4821</div>
+      </div>
+      <div class="order-progress">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width: 65%"></div>
+        </div>
+        <div class="progress-label">En route · 8 min</div>
+      </div>
+    </div>
+
+    <div class="order-track-card" onclick="showToast('Tracking order #W2-4819...')">
+      <div class="order-icon">🧱</div>
+      <div class="order-info">
+        <div class="order-title">Drywall Sheets — 30 units (5/8")</div>
+        <div class="order-sub">From Home Depot · Driver: Carmen L. · Order #W2-4819</div>
+      </div>
+      <div class="order-progress">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width: 30%"></div>
+        </div>
+        <div class="progress-label">Picked up · 22 min</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVAILABLE CONTRACTORS -->
+  <div class="h-scroll-section" id="contractorsSection">
+    <div class="section-header">
+      <div class="section-title">Available Contractors <span>32 online</span></div>
+      <a href="#" class="see-all">See all →</a>
+    </div>
+    <div class="contractors-grid">
+
+      <div class="contractor-card" style="--i:0" id="cc0">
+        <div class="contractor-header">
+          <div class="contractor-avatar" style="background:linear-gradient(135deg,#1a0f00,#2d1a00);">👷</div>
+          <div>
+            <div class="contractor-name">Marcus T.</div>
+            <div class="contractor-specialty">General Contractor · San Diego, CA</div>
+            <div class="contractor-badges">
+              <span class="badge verified">✓ Verified</span>
+              <span class="badge licensed">Licensed</span>
+              <span class="badge premium">⭐ Top Driver</span>
+            </div>
+          </div>
+        </div>
+        <div class="contractor-divider"></div>
+        <div class="contractor-stats">
+          <div class="c-stat"><div class="c-stat-val">4.97</div><div class="c-stat-label">Rating</div></div>
+          <div class="c-stat"><div class="c-stat-val">312</div><div class="c-stat-label">Deliveries</div></div>
+          <div class="c-stat"><div class="c-stat-val">1.8 mi</div><div class="c-stat-label">Distance</div></div>
+        </div>
+        <div class="contractor-tags">
+          <span class="skill-tag">Lumber</span>
+          <span class="skill-tag">Drywall</span>
+          <span class="skill-tag">Heavy Loads</span>
+          <span class="skill-tag">Flatbed</span>
+        </div>
+        <div class="contractor-footer">
+          <div class="avail-status">
+            <div class="avail-dot online"></div>
+            <span class="avail-text online">Available Now</span>
+          </div>
+          <button class="contact-btn" onclick="showToast('Contacting Marcus T...')">
+            📩 Request
+          </button>
+        </div>
+      </div>
+
+      <div class="contractor-card" style="--i:1" id="cc1">
+        <div class="contractor-header">
+          <div class="contractor-avatar" style="background:linear-gradient(135deg,#001a10,#002d1a);">🏗️</div>
+          <div>
+            <div class="contractor-name">Carmen L.</div>
+            <div class="contractor-specialty">Supply Driver · Carlsbad, CA</div>
+            <div class="contractor-badges">
+              <span class="badge verified">✓ Verified</span>
+              <span class="badge licensed">Bonded</span>
+            </div>
+          </div>
+        </div>
+        <div class="contractor-divider"></div>
+        <div class="contractor-stats">
+          <div class="c-stat"><div class="c-stat-val">4.91</div><div class="c-stat-label">Rating</div></div>
+          <div class="c-stat"><div class="c-stat-val">187</div><div class="c-stat-label">Deliveries</div></div>
+          <div class="c-stat"><div class="c-stat-val">3.2 mi</div><div class="c-stat-label">Distance</div></div>
+        </div>
+        <div class="contractor-tags">
+          <span class="skill-tag">Plumbing</span>
+          <span class="skill-tag">Electrical</span>
+          <span class="skill-tag">Box Truck</span>
+        </div>
+        <div class="contractor-footer">
+          <div class="avail-status">
+            <div class="avail-dot busy"></div>
+            <span class="avail-text busy">On Delivery</span>
+          </div>
+          <button class="contact-btn" onclick="showToast('Adding Carmen to queue...')">
+            📅 Queue
+          </button>
+        </div>
+      </div>
+
+      <div class="contractor-card" style="--i:2" id="cc2">
+        <div class="contractor-header">
+          <div class="contractor-avatar" style="background:linear-gradient(135deg,#001220,#002040);">🔧</div>
+          <div>
+            <div class="contractor-name">Derek W.</div>
+            <div class="contractor-specialty">Construction Driver · Vista, CA</div>
+            <div class="contractor-badges">
+              <span class="badge verified">✓ Verified</span>
+              <span class="badge premium">⭐ Top Driver</span>
+            </div>
+          </div>
+        </div>
+        <div class="contractor-divider"></div>
+        <div class="contractor-stats">
+          <div class="c-stat"><div class="c-stat-val">4.88</div><div class="c-stat-label">Rating</div></div>
+          <div class="c-stat"><div class="c-stat-val">445</div><div class="c-stat-label">Deliveries</div></div>
+          <div class="c-stat"><div class="c-stat-val">5.1 mi</div><div class="c-stat-label">Distance</div></div>
+        </div>
+        <div class="contractor-tags">
+          <span class="skill-tag">Concrete</span>
+          <span class="skill-tag">Roofing</span>
+          <span class="skill-tag">Steel</span>
+          <span class="skill-tag">Crane Cert</span>
+        </div>
+        <div class="contractor-footer">
+          <div class="avail-status">
+            <div class="avail-dot online"></div>
+            <span class="avail-text online">Available Now</span>
+          </div>
+          <button class="contact-btn" onclick="showToast('Contacting Derek W...')">
+            📩 Request
+          </button>
+        </div>
+      </div>
+
+      <div class="contractor-card" style="--i:3" id="cc3">
+        <div class="contractor-header">
+          <div class="contractor-avatar" style="background:linear-gradient(135deg,#1a1200,#2d2000);">🚚</div>
+          <div>
+            <div class="contractor-name">Sofia M.</div>
+            <div class="contractor-specialty">Materials Specialist · Oceanside, CA</div>
+            <div class="contractor-badges">
+              <span class="badge verified">✓ Verified</span>
+              <span class="badge licensed">Licensed</span>
+            </div>
+          </div>
+        </div>
+        <div class="contractor-divider"></div>
+        <div class="contractor-stats">
+          <div class="c-stat"><div class="c-stat-val">4.95</div><div class="c-stat-label">Rating</div></div>
+          <div class="c-stat"><div class="c-stat-val">276</div><div class="c-stat-label">Deliveries</div></div>
+          <div class="c-stat"><div class="c-stat-val">2.7 mi</div><div class="c-stat-label">Distance</div></div>
+        </div>
+        <div class="contractor-tags">
+          <span class="skill-tag">Doors</span>
+          <span class="skill-tag">Windows</span>
+          <span class="skill-tag">Glass</span>
+          <span class="skill-tag">Fragile</span>
+        </div>
+        <div class="contractor-footer">
+          <div class="avail-status">
+            <div class="avail-dot online"></div>
+            <span class="avail-text online">Available Now</span>
+          </div>
+          <button class="contact-btn" onclick="showToast('Contacting Sofia M...')">
+            📩 Request
+          </button>
+        </div>
+      </div>
+
+      <div class="contractor-card" style="--i:4" id="cc4">
+        <div class="contractor-header">
+          <div class="contractor-avatar" style="background:linear-gradient(135deg,#0d1a00,#1a2d00);">⚙️</div>
+          <div>
+            <div class="contractor-name">James R.</div>
+            <div class="contractor-specialty">HVAC Driver · El Cajon, CA</div>
+            <div class="contractor-badges">
+              <span class="badge verified">✓ Verified</span>
+            </div>
+          </div>
+        </div>
+        <div class="contractor-divider"></div>
+        <div class="contractor-stats">
+          <div class="c-stat"><div class="c-stat-val">4.72</div><div class="c-stat-label">Rating</div></div>
+          <div class="c-stat"><div class="c-stat-val">98</div><div class="c-stat-label">Deliveries</div></div>
+          <div class="c-stat"><div class="c-stat-val">7.3 mi</div><div class="c-stat-label">Distance</div></div>
+        </div>
+        <div class="contractor-tags">
+          <span class="skill-tag">HVAC</span>
+          <span class="skill-tag">Ductwork</span>
+          <span class="skill-tag">Insulation</span>
+        </div>
+        <div class="contractor-footer">
+          <div class="avail-status">
+            <div class="avail-dot offline"></div>
+            <span class="avail-text offline">Offline</span>
+          </div>
+          <button class="contact-btn" onclick="showToast('Scheduling with James R...')">
+            📅 Schedule
+          </button>
+        </div>
+      </div>
+
+      <div class="contractor-card" style="--i:5" id="cc5">
+        <div class="contractor-header">
+          <div class="contractor-avatar" style="background:linear-gradient(135deg,#1a0014,#2d0022);">🏠</div>
+          <div>
+            <div class="contractor-name">Linda K.</div>
+            <div class="contractor-specialty">Roofing Supplier · Escondido, CA</div>
+            <div class="contractor-badges">
+              <span class="badge verified">✓ Verified</span>
+              <span class="badge licensed">Licensed</span>
+              <span class="badge premium">⭐ Top Driver</span>
+            </div>
+          </div>
+        </div>
+        <div class="contractor-divider"></div>
+        <div class="contractor-stats">
+          <div class="c-stat"><div class="c-stat-val">4.99</div><div class="c-stat-label">Rating</div></div>
+          <div class="c-stat"><div class="c-stat-val">521</div><div class="c-stat-label">Deliveries</div></div>
+          <div class="c-stat"><div class="c-stat-val">4.4 mi</div><div class="c-stat-label">Distance</div></div>
+        </div>
+        <div class="contractor-tags">
+          <span class="skill-tag">Roofing</span>
+          <span class="skill-tag">Shingles</span>
+          <span class="skill-tag">Metal Roof</span>
+          <span class="skill-tag">Flatbed</span>
+        </div>
+        <div class="contractor-footer">
+          <div class="avail-status">
+            <div class="avail-dot online"></div>
+            <span class="avail-text online">Available Now</span>
+          </div>
+          <button class="contact-btn" onclick="showToast('Contacting Linda K...')">
+            📩 Request
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-it-works" id="howSection">
+    <div class="section-header">
+      <div class="section-title">How Wood to You Works</div>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">Step 01</div>
+        <div class="step-icon">📍</div>
+        <div class="step-title">Set Your Job Site</div>
+        <div class="step-desc">Drop a pin on your construction site or enter the address. We'll find everything within delivery range instantly.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 02</div>
+        <div class="step-icon">🛒</div>
+        <div class="step-title">Browse & Order</div>
+        <div class="step-desc">Pick materials from nearby retailers. We verify stock in real-time so you never wait on items that aren't available.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 03</div>
+        <div class="step-icon">🚀</div>
+        <div class="step-title">Track Your Delivery</div>
+        <div class="step-desc">A qualified construction driver picks up and delivers your materials. Track everything live from your phone.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- LOCATION MODAL -->
+<div class="modal-overlay" id="locationModal">
+  <div class="modal-box">
+    <div class="modal-title">Change Delivery Location</div>
+    <div class="modal-sub">Search for your job site or construction address</div>
+    <div class="modal-input-wrap">
+      <span>📍</span>
+      <input class="modal-input" type="text" placeholder="Enter address, city, or zip code..." id="locationInput" />
+    </div>
+    <div class="location-suggestions">
+      <div class="suggestion" onclick="setLocation('Encinitas, CA', '92024')">
+        <span class="suggestion-icon">📍</span>
+        <div>
+          <div class="suggestion-text">Encinitas, CA 92024</div>
+          <div class="suggestion-sub">Current location</div>
+        </div>
+      </div>
+      <div class="suggestion" onclick="setLocation('Carlsbad, CA', '92008')">
+        <span class="suggestion-icon">🏗️</span>
+        <div>
+          <div class="suggestion-text">Carlsbad, CA 92008</div>
+          <div class="suggestion-sub">Recent job site</div>
+        </div>
+      </div>
+      <div class="suggestion" onclick="setLocation('Oceanside, CA', '92054')">
+        <span class="suggestion-icon">🏠</span>
+        <div>
+          <div class="suggestion-text">Oceanside, CA 92054</div>
+          <div class="suggestion-sub">Saved site</div>
+        </div>
+      </div>
+      <div class="suggestion" onclick="detectLocation()">
+        <span class="suggestion-icon">🎯</span>
+        <div>
+          <div class="suggestion-text">Use my current location</div>
+          <div class="suggestion-sub">GPS detection</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmLocation()">Confirm Location</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastMsg">✓ Done</span>
+</div>
+
+<script>
+  // ── INTERSECTION OBSERVER for scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // stagger contractor cards
+        if (entry.target.classList.contains('contractors-grid')) {
+          entry.target.querySelectorAll('.contractor-card').forEach(c => c.classList.add('visible'));
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.h-scroll-section, .request-banner, .active-orders, .how-it-works').forEach(el => observer.observe(el));
+
+  // contractor cards observed separately
+  const cObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        cObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.contractor-card').forEach(el => cObserver.observe(el));
+
+  // ── LOCATION MODAL
+  function openModal() {
+    document.getElementById('locationModal').classList.add('open');
+    setTimeout(() => document.getElementById('locationInput').focus(), 300);
+  }
+  function closeModal() {
+    document.getElementById('locationModal').classList.remove('open');
+  }
+  function setLocation(city, zip) {
+    document.getElementById('locationInput').value = city;
+    document.getElementById('cityDisplay').textContent = city;
+  }
+  function detectLocation() {
+    showToast('🎯 Detecting location...');
+    setTimeout(() => {
+      setLocation('Encinitas, CA', '92024');
+      closeModal();
+      showToast('✓ Location updated to Encinitas, CA');
+    }, 1200);
+  }
+  function confirmLocation() {
+    const val = document.getElementById('locationInput').value || 'Encinitas, CA';
+    document.getElementById('cityDisplay').textContent = val;
+    closeModal();
+    showToast('✓ Delivering to ' + val);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('locationModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── CATEGORY CHIPS
+  function filterCat(chip) {
+    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    showToast('Filtering by ' + chip.querySelector('span:last-child').textContent);
+  }
+
+  // ── TOAST
+  let toastTimer;
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  // ── DRAG SCROLL on horizontal tracks
+  document.querySelectorAll('.h-scroll-track').forEach(track => {
+    let isDown = false, startX, scrollLeft;
+    track.addEventListener('mousedown', e => {
+      isDown = true;
+      startX = e.pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
+    });
+    document.addEventListener('mouseup', () => isDown = false);
+    track.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - track.offsetLeft;
+      track.scrollLeft = scrollLeft - (x - startX) * 1.4;
+    });
+  });
+
+  // ── KEYBOARD SHORTCUT for search
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('searchInput').focus();
+    }
+  });
+
+  // ── ANIMATE PROGRESS BARS on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.progress-bar-fill').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0%';
+      requestAnimationFrame(() => {
+        setTimeout(() => { bar.style.width = w; }, 400);
+      });
+    });
+  });
+</script>
+</body>
+</html>
